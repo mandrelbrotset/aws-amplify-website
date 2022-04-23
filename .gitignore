@@ -1,7 +1,8 @@
-# Exclude vscode and other amplify file
+# Exclude vscode, other amplify files
 .vscode
 amplify/team-provider-info.json
 amplify/backend/api/awsamplifywebsite/cli-inputs.json
+src.egg-info
 
 # Logs
 logs

@@ -1,20 +1,26 @@
 {
-  "api": {
-    "awsamplifywebsite": {
-      "service": "AppSync",
+  "storage": {
+    "RespositoryData": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "function": {
+    "RespositoryDataFunc": {
+      "build": true,
       "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "output": {
-        "authConfig": {
-          "defaultAuthentication": {
-            "authenticationType": "API_KEY",
-            "apiKeyConfig": {
-              "apiKeyExpirationDays": 7
-            }
-          },
-          "additionalAuthenticationProviders": []
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "RespositoryData",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
         }
-      }
+      ]
     }
   }
 }

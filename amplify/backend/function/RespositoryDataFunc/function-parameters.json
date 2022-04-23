@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "storage": {
+      "RespositoryData": [
+        "create",
+        "read",
+        "update"
+      ]
+    }
+  },
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "githubApiUrl",
+      "environmentVariableName": "GITHUB_API_URL"
+    }
+  ]
+}
