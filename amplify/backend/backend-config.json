@@ -1,19 +1,19 @@
 {
   "storage": {
-    "RespositoryData": {
+    "Repository": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
     }
   },
   "function": {
-    "RespositoryDataFunc": {
+    "RepositoryDataFunction": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda",
       "dependsOn": [
         {
           "category": "storage",
-          "resourceName": "RespositoryData",
+          "resourceName": "Repository",
           "attributes": [
             "Name",
             "Arn",
@@ -21,6 +21,11 @@
           ]
         }
       ]
+    },
+    "videoDataFunction": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "api": {
@@ -30,7 +35,15 @@
       "dependsOn": [
         {
           "category": "function",
-          "resourceName": "RespositoryDataFunc",
+          "resourceName": "RepositoryDataFunction",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "videoDataFunction",
           "attributes": [
             "Name",
             "Arn"

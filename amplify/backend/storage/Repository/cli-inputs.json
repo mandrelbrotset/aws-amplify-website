@@ -1,0 +1,10 @@
+{
+  "resourceName": "Repository",
+  "tableName": "Repository",
+  "partitionKey": {
+    "fieldName": "Id",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

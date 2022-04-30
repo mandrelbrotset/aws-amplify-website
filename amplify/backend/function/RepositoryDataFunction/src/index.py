@@ -4,13 +4,17 @@ import boto3
 import urllib.request
 import urllib.error
 from datetime import datetime
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 # maximum cache age in hours
 max_cache_age = 12.0
 
 def update_repository_data_table(repo_data):
-    table_name = os.environ["STORAGE_RESPOSITORYDATA_NAME"]
+    table_name = os.environ["STORAGE_REPOSITORY_NAME"]
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
@@ -20,26 +24,21 @@ def update_repository_data_table(repo_data):
 
             for repository in repo_data:
                 item = {
-                    'Id'            : repository['id'],
+                    'Id'            : str(repository['id']),
                     'Name'          : repository['name'],
                     'Description'   : repository['description'],
                     'Language'      : repository['language'],
-                    'Stars'         : repository['stargazers_count'],
+                    'Stars'         : str(repository['stargazers_count']),
                     'Url'           : repository['url'],
                     'CreatedAt'     : repository['created_at'],
                     'UpdatedAt'     : date_updated.strftime(time_format)
                 }
                 batch.put_item(Item=item)
 
-        # log success
-        # 
-
+        logger.info("Successfully updated table!")
         return True
     except Exception as e:
-        print(e)
-        # log error
-        #
-
+        logger.error(e)
         return False
 
 
@@ -48,29 +47,23 @@ def update_repository_data():
 
     try:
         with urllib.request.urlopen(github_api_url, timeout=2) as response:
-            # log success
-            #{"status"  : response.status,
-            # "message" : "success"}
-
+            logger.info("Received HTTP {} response while making get request to {}".format(response.status, github_api_url))
+            
             github_data = json.loads(response.read().decode())
             status = update_repository_data_table(github_data)
 
-            if status:            
+            if status:
+                logger.info("Updated cache")
                 return True
-
             return False
 
     except urllib.error.HTTPError as e:
-        print(e)
-        
-        # log error
-        #{"status"  : e.code,
-        # "message" : e.reason}
+        logger.info("Received HTTP {} : {} making get request to {}".format(e.code, e.reason, github_api_url))
         return False
 
 
 def get_respository_data():
-    table_name = "RespositoryData-dev"
+    table_name = os.environ["STORAGE_REPOSITORY_NAME"]
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(table_name)
 
@@ -83,23 +76,14 @@ def get_respository_data():
         time_difference = current_time - last_updated_time
 
         if time_difference.seconds / 3600 > max_cache_age:
-            # log info about update
             update_repository_data()
 
         response = table.scan()
-
-        # log success
-        #{"status"  : response['ResponseMetadata']['HTTPStatusCode'], 
-        # "message" : "received " + len(response['Items']) + " items"}
-
+        logger.info("Retrieved {} items from cache".format(len(response['Items'])))
         return response['Items']
 
     except Exception as e:
-        print(e)
-
-        # log error
-        #{"status"  : e.response['ResponseMetadata']['HTTPStatusCode'],
-        # "message" : e.response['Error']['Message']}
+        logger.error("Received HTTP {} : {} while querying cache".format(e.response['ResponseMetadata']['HTTPStatusCode'], e.response['Error']['Message']))
         return None
 
 
@@ -113,5 +97,5 @@ def handler(event, context):
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
         },
-        'body': repository_data
+        'body': json.dumps(repository_data)
     } 

@@ -3,7 +3,14 @@
   "paths": {
     "/repos": {
       "name": "/repos",
-      "lambdaFunction": "RespositoryDataFunc",
+      "lambdaFunction": "RepositoryDataFunction",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/videos": {
+      "name": "/videos",
+      "lambdaFunction": "videoDataFunction",
       "permissions": {
         "setting": "open"
       }

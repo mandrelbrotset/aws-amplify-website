@@ -1,6 +1,6 @@
 export type AmplifyDependentResourcesAttributes = {
     "storage": {
-        "RespositoryData": {
+        "Repository": {
             "Name": "string",
             "Arn": "string",
             "StreamArn": "string",
@@ -10,7 +10,13 @@ export type AmplifyDependentResourcesAttributes = {
         }
     },
     "function": {
-        "RespositoryDataFunc": {
+        "RepositoryDataFunction": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
+        },
+        "videoDataFunction": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
